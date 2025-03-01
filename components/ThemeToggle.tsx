@@ -1,26 +1,41 @@
 "use client";
 
 import React from "react";
-import { useTheme } from "../context/ThemeContext";
-import { useLocale } from "../context/LocaleContext";
+import { useTheme } from "@/context/ThemeContext";
+import { useLocale } from "@/context/LocaleContext";
 
 const ThemeToggle = () => {
   const { theme, setTheme } = useTheme();
   const { translations } = useLocale();
 
+  // Toggles between light and dark mode
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
+
   return (
     <div className="flex items-center space-x-2">
-      <label className="text-sm font-medium dark:text-white">
-        {translations.ui.theme}:
-      </label>
-      <select
-        value={theme}
-        onChange={(e) => setTheme(e.target.value)}
-        className="border p-1 rounded text-sm dark:bg-gray-800 dark:text-white dark:border-gray-700"
+      <label className="text-sm font-medium">{translations.ui.theme}:</label>
+
+      {/* Button toggle instead of select for better visibility */}
+      <button
+        onClick={toggleTheme}
+        className={`
+          px-3 py-1 rounded-md text-sm font-medium
+          ${
+            theme === "light"
+              ? "bg-gray-200 text-gray-800"
+              : "bg-gray-700 text-gray-100"
+          }
+          transition-colors duration-200
+        `}
       >
-        <option value="light">{translations.ui.light}</option>
-        <option value="dark">{translations.ui.dark}</option>
-      </select>
+        {theme === "light" ? (
+          <span>🌞 {translations.ui.light}</span>
+        ) : (
+          <span>🌙 {translations.ui.dark}</span>
+        )}
+      </button>
     </div>
   );
 };

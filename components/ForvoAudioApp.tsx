@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "@/context/LocaleContext";
+import { useTheme } from "@/context/ThemeContext";
 import LanguageSelector from "@/components/LanguageSelector";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -18,6 +19,7 @@ const languages = {
 
 const ForvoAudioApp = () => {
   const { translations } = useLocale();
+  const { theme } = useTheme();
   const [word, setWord] = useState("");
   const [language, setLanguage] = useState("en");
   const [audioUrls, setAudioUrls] = useState<string[]>([]);
@@ -65,26 +67,28 @@ const ForvoAudioApp = () => {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md">
+    <div className="app-container p-6 max-w-md mx-auto rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-4">
         <LanguageSelector />
         <ThemeToggle />
       </div>
 
-      <h2 className="text-xl font-bold mb-4 dark:text-white">
-        {translations.app.title}
-      </h2>
+      <div className="theme-indicator mb-2 text-xs">
+        Current theme: <span className="font-semibold">{theme}</span>
+      </div>
+
+      <h2 className="text-xl font-bold mb-4">{translations.app.title}</h2>
 
       <input
         type="text"
         placeholder={translations.app.wordPlaceholder}
         value={word}
         onChange={(e) => setWord(e.target.value)}
-        className="border p-2 rounded w-full dark:bg-gray-800 dark:text-white dark:border-gray-700"
+        className="border p-2 rounded w-full"
       />
 
       <select
-        className="border p-2 rounded w-full mt-2 dark:bg-gray-800 dark:text-white dark:border-gray-700"
+        className="border p-2 rounded w-full mt-2"
         value={language}
         onChange={(e) => setLanguage(e.target.value)}
       >
@@ -105,16 +109,16 @@ const ForvoAudioApp = () => {
         {isLoading ? "Loading..." : translations.app.getAudio}
       </button>
 
-      {error && <p className="text-red-500 mt-2 dark:text-red-400">{error}</p>}
+      {error && <p className="text-red-500 mt-2">{error}</p>}
 
       {audioUrls.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-lg font-semibold dark:text-white">
+          <h3 className="text-lg font-semibold">
             {translations.app.pronunciationVariants}
           </h3>
           {audioUrls.map((url, index) => (
             <div key={index} className="mt-2">
-              <audio controls className="w-full dark:bg-gray-700">
+              <audio controls className="w-full">
                 <source src={url} type="audio/mpeg" />
                 {translations.app.browserNotSupported}
               </audio>
