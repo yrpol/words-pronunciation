@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useLocale } from "@/context/LocaleContext";
 import LanguageSelector from "@/components/LanguageSelector";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const languages = {
   en: "English",
@@ -64,18 +65,26 @@ const ForvoAudioApp = () => {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-md">
-      <LanguageSelector />
-      <h2 className="text-xl font-bold mb-4">{translations.app.title}</h2>
+    <div className="p-6 max-w-md mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 space-y-2 md:space-y-0">
+        <LanguageSelector />
+        <ThemeToggle />
+      </div>
+
+      <h2 className="text-xl font-bold mb-4 dark:text-white">
+        {translations.app.title}
+      </h2>
+
       <input
         type="text"
         placeholder={translations.app.wordPlaceholder}
         value={word}
         onChange={(e) => setWord(e.target.value)}
-        className="border p-2 rounded w-full"
+        className="border p-2 rounded w-full dark:bg-gray-800 dark:text-white dark:border-gray-700"
       />
+
       <select
-        className="border p-2 rounded w-full mt-2"
+        className="border p-2 rounded w-full mt-2 dark:bg-gray-800 dark:text-white dark:border-gray-700"
         value={language}
         onChange={(e) => setLanguage(e.target.value)}
       >
@@ -85,8 +94,9 @@ const ForvoAudioApp = () => {
           </option>
         ))}
       </select>
+
       <button
-        className={`mt-2 bg-blue-500 text-white p-2 rounded w-full ${
+        className={`mt-2 bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 ${
           isLoading ? "opacity-50 cursor-not-allowed" : ""
         }`}
         onClick={fetchAudio}
@@ -94,20 +104,22 @@ const ForvoAudioApp = () => {
       >
         {isLoading ? "Loading..." : translations.app.getAudio}
       </button>
-      {error && <p className="text-red-500 mt-2">{error}</p>}
+
+      {error && <p className="text-red-500 mt-2 dark:text-red-400">{error}</p>}
+
       {audioUrls.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-lg font-semibold">
+          <h3 className="text-lg font-semibold dark:text-white">
             {translations.app.pronunciationVariants}
           </h3>
           {audioUrls.map((url, index) => (
             <div key={index} className="mt-2">
-              <audio controls>
+              <audio controls className="w-full dark:bg-gray-700">
                 <source src={url} type="audio/mpeg" />
                 {translations.app.browserNotSupported}
               </audio>
               <button
-                className="mt-1 bg-green-500 text-white p-2 rounded w-full"
+                className="mt-1 bg-green-500 text-white p-2 rounded w-full hover:bg-green-600"
                 onClick={() => downloadAudio(url, index)}
               >
                 {translations.app.download} {index + 1}
