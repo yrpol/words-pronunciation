@@ -16,13 +16,13 @@ const languages = {
 const ForvoAudioApp = () => {
   const [word, setWord] = useState("");
   const [language, setLanguage] = useState("en");
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioUrls, setAudioUrls] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAudio = async () => {
     if (!word) return;
     setError(null);
-    setAudioUrl(null);
+    setAudioUrls([]);
 
     try {
       const response = await fetch(
@@ -37,7 +37,7 @@ const ForvoAudioApp = () => {
       console.log("Отримані дані:", data);
 
       if (data.items && data.items.length > 0) {
-        setAudioUrl(data.items[0].pathmp3);
+        setAudioUrls(data.items.map((item: any) => item.pathmp3));
       } else {
         setError("Аудіо не знайдено.");
       }
@@ -45,6 +45,15 @@ const ForvoAudioApp = () => {
       console.error("Помилка отримання даних:", err);
       setError("Помилка отримання даних. Перевірте API-ключ або запит.");
     }
+  };
+
+  const downloadAudio = (url: string, index: number) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${word}-${language}-${index + 1}.mp3`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -75,11 +84,24 @@ const ForvoAudioApp = () => {
         Отримати аудіо
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
-      {audioUrl && (
-        <audio className="mt-4" controls>
-          <source src={audioUrl} type="audio/mpeg" />
-          Ваш браузер не підтримує аудіо.
-        </audio>
+      {audioUrls.length > 0 && (
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold">Варіанти вимови:</h3>
+          {audioUrls.map((url, index) => (
+            <div key={index} className="mt-2">
+              <audio controls>
+                <source src={url} type="audio/mpeg" />
+                Ваш браузер не підтримує аудіо.
+              </audio>
+              <button
+                className="mt-1 bg-green-500 text-white p-2 rounded w-full"
+                onClick={() => downloadAudio(url, index)}
+              >
+                Завантажити варіант {index + 1}
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
