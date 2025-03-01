@@ -66,7 +66,7 @@ const ForvoAudioApp = () => {
 
   return (
     <div className="p-6 max-w-md mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 space-y-2 md:space-y-0">
+      <div className="flex justify-between items-center mb-4">
         <LanguageSelector />
         <ThemeToggle />
       </div>

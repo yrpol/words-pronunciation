@@ -23,22 +23,32 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setThemeState] = useState("light");
 
+  // Apply theme changes to the DOM
+  const applyTheme = (newTheme: string) => {
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
   useEffect(() => {
-    // Check for saved theme preference or use system preference
+    // Get initial theme from localStorage or system preference
     const savedTheme = localStorage.getItem("theme");
+
     if (savedTheme) {
       setThemeState(savedTheme);
-      document.documentElement.classList.toggle("dark", savedTheme === "dark");
+      applyTheme(savedTheme);
     } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       setThemeState("dark");
-      document.documentElement.classList.add("dark");
+      applyTheme("dark");
     }
   }, []);
 
   const setTheme = (newTheme: string) => {
     localStorage.setItem("theme", newTheme);
     setThemeState(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
+    applyTheme(newTheme);
   };
 
   return (
