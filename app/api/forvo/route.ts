@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_KEY = "b84c00f05890f14c6a3705a8db8ef022";
+const API_KEY = process.env.NEXT_PUBLIC_FORVO_API_KEY;
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
