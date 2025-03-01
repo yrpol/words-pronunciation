@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "@/context/LocaleContext";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const languages = {
   en: "English",
@@ -14,36 +16,41 @@ const languages = {
 };
 
 const ForvoAudioApp = () => {
+  const { translations } = useLocale();
   const [word, setWord] = useState("");
   const [language, setLanguage] = useState("en");
   const [audioUrls, setAudioUrls] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchAudio = async () => {
     if (!word) return;
     setError(null);
     setAudioUrls([]);
+    setIsLoading(true);
 
     try {
       const response = await fetch(
-        `/api/forvo?word=${word}&language=${language}`,
+        `/api/forvo?word=${encodeURIComponent(word)}&language=${language}`,
       );
 
       if (!response.ok) {
-        throw new Error(`Помилка: ${response.status} ${response.statusText}`);
+        throw new Error(`${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log("Отримані дані:", data);
+      console.log("Received data:", data);
 
       if (data.items && data.items.length > 0) {
         setAudioUrls(data.items.map((item: any) => item.pathmp3));
       } else {
-        setError("Аудіо не знайдено.");
+        setError(translations.app.noAudioFound);
       }
     } catch (err) {
-      console.error("Помилка отримання даних:", err);
-      setError("Помилка отримання даних. Перевірте API-ключ або запит.");
+      console.error("Error fetching data:", err);
+      setError(translations.app.error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,11 +64,12 @@ const ForvoAudioApp = () => {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Forvo Audio Pronunciation</h2>
+    <div className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-md">
+      <LanguageSelector />
+      <h2 className="text-xl font-bold mb-4">{translations.app.title}</h2>
       <input
         type="text"
-        placeholder="Введіть слово"
+        placeholder={translations.app.wordPlaceholder}
         value={word}
         onChange={(e) => setWord(e.target.value)}
         className="border p-2 rounded w-full"
@@ -73,31 +81,36 @@ const ForvoAudioApp = () => {
       >
         {Object.entries(languages).map(([code, name]) => (
           <option key={code} value={code}>
-            {name}
+            {translations.languages[code]}
           </option>
         ))}
       </select>
       <button
-        className="mt-2 bg-blue-500 text-white p-2 rounded w-full"
+        className={`mt-2 bg-blue-500 text-white p-2 rounded w-full ${
+          isLoading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
         onClick={fetchAudio}
+        disabled={isLoading}
       >
-        Отримати аудіо
+        {isLoading ? "Loading..." : translations.app.getAudio}
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
       {audioUrls.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-lg font-semibold">Варіанти вимови:</h3>
+          <h3 className="text-lg font-semibold">
+            {translations.app.pronunciationVariants}
+          </h3>
           {audioUrls.map((url, index) => (
             <div key={index} className="mt-2">
               <audio controls>
                 <source src={url} type="audio/mpeg" />
-                Ваш браузер не підтримує аудіо.
+                {translations.app.browserNotSupported}
               </audio>
               <button
                 className="mt-1 bg-green-500 text-white p-2 rounded w-full"
                 onClick={() => downloadAudio(url, index)}
               >
-                Завантажити варіант {index + 1}
+                {translations.app.download} {index + 1}
               </button>
             </div>
           ))}
